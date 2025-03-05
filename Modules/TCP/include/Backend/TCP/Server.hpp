@@ -2,37 +2,41 @@
 
 #include <iostream>
 #include <string>
+#include <cstring>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <unistd.h>
 
+#include "Backend/BasicType.hpp"
+
 namespace Utils :: TCP{
 
-    enum IPType{
-        IPV4 = 0,
-        IPV6 = 1
-    };
-
-    class TCPServer {
+    class SingleTCPServer {
     public:
-        TCPServer();
-        TCPServer(int port);
-        TCPServer(int port, IPType ipType);
-        TCPServer(int port, IPType ipType, int bufferSize);
+        SingleTCPServer();
+        SingleTCPServer(int port);
+        SingleTCPServer(int port, IPType ipType);
+        SingleTCPServer(int port, IPType ipType, int bufferSize);
+        SingleTCPServer(int port, IPType ipType, int bufferSize, const std::string& serverAddress);
+        ~SingleTCPServer();
 
-         ~TCPServer();
+        bool CreateServer();
+        bool BindPort(int Port = 1717);
+        bool ListenServer();
+        bool AcceptClient();
+        bool SendData(const std::string& data);
+        bool RecvData(std::string& data);
 
-         bool CreateServer(); // 创建服务器socket文件描述符
-
-         bool BindServer();
-
+        bool CloseServer();
+        bool CloseClient();
 
     private:
-        int Port{1717}; // 开放的端口号
-        IPType IPType{IPV4};
-        int BufferSize{1024}; // 缓冲区大小
-        int ServerSocket{-1}; // 服务器socket文件描述符
-        int ClientSocket{-1}; // 客户端socket文件描述符
+        int port{1717};
+        IPType ipType{IPType::IPV4};
+        int bufferSize{1024};
+        int serverSocket{-1};
+        int clientSocket{-1};
+        std::string serverAddress{"0.0.0.0"};
     };
 
 
