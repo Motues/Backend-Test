@@ -14,18 +14,19 @@ namespace Utils :: TCP{
     class SingleTCPServer {
     public:
         SingleTCPServer();
-        SingleTCPServer(int port);
-        SingleTCPServer(int port, IPType ipType);
+        explicit SingleTCPServer(int port);
+        explicit SingleTCPServer(std::string serverAddress);
+        SingleTCPServer(int port, std::string serverAddress);
         SingleTCPServer(int port, IPType ipType, int bufferSize);
-        SingleTCPServer(int port, IPType ipType, int bufferSize, const std::string& serverAddress);
+        SingleTCPServer(int port, IPType ipType, int bufferSize, std::string  serverAddress);
         ~SingleTCPServer();
 
         bool CreateServer();
-        bool BindPort(int Port = 1717);
+        bool BindPort();
         bool ListenServer();
         bool AcceptClient();
-        bool SendData(const std::string& data);
-        bool RecvData(std::string& data);
+        [[nodiscard]] bool SendData(const std::string& data) const;
+        [[nodiscard]] bool RecData(std::string& data);
 
         bool CloseServer();
         bool CloseClient();
@@ -36,7 +37,7 @@ namespace Utils :: TCP{
         int bufferSize{1024};
         int serverSocket{-1};
         int clientSocket{-1};
-        std::string serverAddress{"0.0.0.0"};
+        std::string serverAddress{"127.0.0.1"};
     };
 
 

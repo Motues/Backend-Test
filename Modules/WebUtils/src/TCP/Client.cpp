@@ -1,21 +1,26 @@
 #include <arpa/inet.h>
+
+#include <utility>
 #include "Backend/TCP/Client.hpp"
 
 namespace Utils::TCP {
 
-TCPClient::TCPClient() = default;
+SingleTCPClient::SingleTCPClient() = default;
 
-TCPClient::TCPClient(const std::string& serverAddress, int port) : serverAddress(serverAddress), port(port) {}
+SingleTCPClient::SingleTCPClient(std::string serverAddress, int port) :
+    serverAddress(std::move(serverAddress)), port(port) {}
 
-TCPClient::TCPClient(const std::string& serverAddress, int port, IPType ipType) : serverAddress(serverAddress), port(port), ipType(ipType) {}
+SingleTCPClient::SingleTCPClient(std::string serverAddress, int port, IPType ipType) :
+    serverAddress(std::move(serverAddress)), port(port), ipType(ipType) {}
 
-TCPClient::TCPClient(const std::string& serverAddress, int port, IPType ipType, int bufferSize) : serverAddress(serverAddress), port(port), ipType(ipType), bufferSize(bufferSize) {}
+SingleTCPClient::SingleTCPClient(std::string serverAddress, int port, IPType ipType, int bufferSize) :
+    serverAddress(std::move(serverAddress)), port(port), ipType(ipType), bufferSize(bufferSize) {}
 
-TCPClient::~TCPClient() {
+SingleTCPClient::~SingleTCPClient() {
     CloseConnection();
 }
 
-bool TCPClient::ConnectToServer() {
+bool SingleTCPClient::ConnectToServer() {
     int domain;
     if (ipType == IPType::IPV4) domain = AF_INET;
     else domain = AF_INET6;
@@ -42,7 +47,7 @@ bool TCPClient::ConnectToServer() {
     return true;
 }
 
-bool TCPClient::SendData(const std::string& data) {
+bool SingleTCPClient::SendData(const std::string& data) {
     if (clientSocket == -1) {
         std::cerr << "Client socket not created" << std::endl;
         return false;
@@ -63,7 +68,7 @@ bool TCPClient::SendData(const std::string& data) {
     return true;
 }
 
-bool TCPClient::RecvData(std::string& data) {
+bool SingleTCPClient::RecvData(std::string& data) {
     if (clientSocket == -1) {
         std::cerr << "Client socket not created" << std::endl;
         return false;
@@ -83,7 +88,7 @@ bool TCPClient::RecvData(std::string& data) {
     return true;
 }
 
-bool TCPClient::CloseConnection() {
+bool SingleTCPClient::CloseConnection() {
     if (clientSocket != -1) {
         close(clientSocket);
         clientSocket = -1;

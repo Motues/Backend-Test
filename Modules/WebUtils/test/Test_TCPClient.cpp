@@ -1,9 +1,9 @@
 #include <iostream>
 #include <string>
-#include "Backend/TCP.hpp"
+#include "Backend/WebUtils.hpp"
 
 void RunClient() {
-    Utils::TCP::TCPClient client("127.0.0.1", 1717, Utils::IPType::IPV4, 1024);
+    Utils::TCP::SingleTCPClient client("127.0.0.1", 1717, Utils::IPType::IPV4, 1024);
     if (!client.ConnectToServer()) {
         std::cerr << "Failed to connect to server." << std::endl;
         return;

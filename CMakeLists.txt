@@ -21,7 +21,7 @@ AddModulesInDirectory(
     DIRECTORY "Modules"
     NAMES
         "BasicType"
-        "TCP"
+        "WebUtils"
 
 )
 

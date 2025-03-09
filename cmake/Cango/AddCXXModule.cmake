@@ -103,7 +103,7 @@ endmacro()
 macro(Cango_AddCXXModule_AddSources)
     # 寻找模块的所有源文件，如果没有找到至少一个源文件，则报错
     set(module_source_dir ${PROJECT_SOURCE_DIR}/${ARG_SOURCE_DIR})
-    aux_source_directory(${PROJECT_SOURCE_DIR}/${ARG_SOURCE_DIR} module_sources)
+    file(GLOB_RECURSE module_sources "${module_source_dir}/*.cpp")
     list(LENGTH module_sources module_sources_count)
     if (module_sources_count EQUAL 0)
         message(FATAL_ERROR "${PROJECT_NAME}> 在目标目录没有找到源文件：${module_source_dir}")

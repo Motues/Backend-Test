@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.28)
 
-project(Backend.TCP)
+project(Backend.WebUtils)
 
 AddCXXModule(
-    NAME "TCP"
+    NAME "WebUtils"
     NAMESPACE "Backend"
     CXX_STANDARD "26"
     HEADER_DIR "include"

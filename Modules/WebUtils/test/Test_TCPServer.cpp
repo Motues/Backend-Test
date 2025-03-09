@@ -1,12 +1,12 @@
 #include <iostream>
 #include <thread>
-#include "Backend/TCP.hpp"
+#include "Backend/WebUtils.hpp"
 
 // 处理客户端连接的函数
 void HandleClient(Utils::TCP::SingleTCPServer& server) {
     while (true) {
         std::string receivedData;
-        if (server.RecvData(receivedData)) {
+        if (server.RecData(receivedData)) {
             std::cout << "Server received data: " << receivedData << std::endl;
 
             // 发送确认信号
@@ -26,7 +26,7 @@ void RunServer() {
         std::cerr << "Failed to create server." << std::endl;
         return;
     }
-    if (!server.BindPort(1717)) {
+    if (!server.BindPort()) {
         std::cerr << "Failed to bind port." << std::endl;
         return;
     }

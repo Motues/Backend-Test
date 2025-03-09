@@ -1,14 +1,22 @@
 #include <arpa/inet.h>
+
+#include <utility>
 #include "Backend/TCP/Server.hpp"
 
 namespace Utils :: TCP{
 
 SingleTCPServer::SingleTCPServer() = default;
-SingleTCPServer::SingleTCPServer(int port) : port(port) {}
-SingleTCPServer::SingleTCPServer(int port, IPType ipType) : port(port), ipType(ipType) {}
-SingleTCPServer::SingleTCPServer(int port, IPType ipType, int bufferSize) : port(port), ipType(ipType), bufferSize(bufferSize) {}
-SingleTCPServer::SingleTCPServer(int port, IPType ipType, int bufferSize, const std::string& serverAddress)
-    : port(port), ipType(ipType), bufferSize(bufferSize), serverAddress(serverAddress) {}
+
+SingleTCPServer::SingleTCPServer(int port) :
+    port(port) {}
+SingleTCPServer::SingleTCPServer(std::string serverAddress) :
+     serverAddress(std::move(serverAddress)){}
+SingleTCPServer::SingleTCPServer(int port, std::string serverAddress) :
+    port(port), serverAddress(std::move(serverAddress)) {}
+SingleTCPServer::SingleTCPServer(int port, IPType ipType, int bufferSize) :
+    port(port), ipType(ipType), bufferSize(bufferSize) {}
+SingleTCPServer::SingleTCPServer(int port, IPType ipType, int bufferSize, std::string  serverAddress) :
+    port(port), ipType(ipType), bufferSize(bufferSize), serverAddress(std::move(serverAddress)) {}
 
 SingleTCPServer::~SingleTCPServer() {
     CloseServer();
@@ -26,9 +34,8 @@ bool SingleTCPServer::CreateServer() {
         return false;
     }
 
-    // 设置 SO_REUSEADDR 选项
-    int optval = 1;
-    if (setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)) < 0) {
+    int opt = 1; // 启用 SO_REUSEADDR 选项
+    if (setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
         std::cerr << "Failed to set SO_REUSEADDR option" << std::endl;
         close(serverSocket);
         return false;
@@ -38,13 +45,12 @@ bool SingleTCPServer::CreateServer() {
     return true;
 }
 
-bool SingleTCPServer::BindPort(int Port) {
+bool SingleTCPServer::BindPort() {
     int domain;
     if (ipType == IPType::IPV4) domain = AF_INET;
     else domain = AF_INET6;
 
     sockaddr_in address = {0};
-    port = Port;
     address.sin_family = domain;
 
     // 使用 serverAddress 而不是固定绑定到 INADDR_ANY
@@ -62,7 +68,7 @@ bool SingleTCPServer::BindPort(int Port) {
     return true;
 }
 
-bool SingleTCPServer::ListenServer() {
+bool SingleTCPServer::ListenServer(){
     if (listen(serverSocket, 5) < 0) {
         std::cerr << "Listen failed" << std::endl;
         return false;
@@ -88,7 +94,7 @@ bool SingleTCPServer::AcceptClient() {
     return true;
 }
 
-bool SingleTCPServer::SendData(const std::string& data) {
+bool SingleTCPServer::SendData(const std::string& data) const {
     if (clientSocket == -1) {
         std::cerr << "Client socket not created" << std::endl;
         return false;
@@ -109,7 +115,7 @@ bool SingleTCPServer::SendData(const std::string& data) {
     return true;
 }
 
-bool SingleTCPServer::RecvData(std::string& data) {
+bool SingleTCPServer::RecData(std::string& data) {
     if (clientSocket == -1) {
         std::cerr << "Client socket not created" << std::endl;
         return false;

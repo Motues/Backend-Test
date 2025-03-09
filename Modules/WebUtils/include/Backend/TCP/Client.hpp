@@ -11,14 +11,14 @@
 
 namespace Utils::TCP {
 
-    class TCPClient {
+    class SingleTCPClient {
     public:
-        TCPClient();
-        TCPClient(const std::string& serverAddress, int port);
-        TCPClient(const std::string& serverAddress, int port, IPType ipType);
-        TCPClient(const std::string& serverAddress, int port, IPType ipType, int bufferSize);
+        SingleTCPClient();
+        SingleTCPClient(std::string  serverAddress, int port);
+        SingleTCPClient(std::string  serverAddress, int port, IPType ipType);
+        SingleTCPClient(std::string  serverAddress, int port, IPType ipType, int bufferSize);
 
-        ~TCPClient();
+        ~SingleTCPClient();
 
         bool ConnectToServer(); // 连接到服务器
         bool SendData(const std::string& data); // 发送数据到服务器
