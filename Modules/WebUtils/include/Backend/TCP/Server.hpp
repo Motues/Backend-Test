@@ -40,5 +40,10 @@ namespace Utils :: TCP{
         std::string serverAddress{"127.0.0.1"};
     };
 
+    class AsyncTCPServer {
+    public:
+        AsyncTCPServer();
+        ~AsyncTCPServer();
+    };
 
 }
