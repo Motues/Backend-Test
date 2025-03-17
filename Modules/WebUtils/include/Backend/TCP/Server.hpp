@@ -17,6 +17,7 @@ namespace Utils :: TCP{
         explicit SingleTCPServer(int port);
         explicit SingleTCPServer(std::string serverAddress);
         SingleTCPServer(int port, std::string serverAddress);
+        SingleTCPServer(int port, std::string serverAddress, int bufferSize);
         SingleTCPServer(int port, IPType ipType, int bufferSize);
         SingleTCPServer(int port, IPType ipType, int bufferSize, std::string  serverAddress);
         ~SingleTCPServer();

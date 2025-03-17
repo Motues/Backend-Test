@@ -6,11 +6,11 @@
 namespace Backend::Log {
 
     enum class LogLevel {
-        Info,
+        Trace,
         Debug,
-        Error,
+        Info,
         Warning,
-        Trace
+        Error,
     };
 
     class LogPolicy {

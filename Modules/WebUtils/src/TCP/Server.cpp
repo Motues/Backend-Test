@@ -13,6 +13,8 @@ SingleTCPServer::SingleTCPServer(std::string serverAddress) :
      serverAddress(std::move(serverAddress)){}
 SingleTCPServer::SingleTCPServer(int port, std::string serverAddress) :
     port(port), serverAddress(std::move(serverAddress)) {}
+SingleTCPServer::SingleTCPServer(int port, std::string serverAddress, int bufferSize) :
+    port(port), serverAddress(std::move(serverAddress)), bufferSize(bufferSize) {}
 SingleTCPServer::SingleTCPServer(int port, IPType ipType, int bufferSize) :
     port(port), ipType(ipType), bufferSize(bufferSize) {}
 SingleTCPServer::SingleTCPServer(int port, IPType ipType, int bufferSize, std::string  serverAddress) :

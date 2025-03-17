@@ -4,7 +4,7 @@
 #include <vector>
 #include <chrono>
 
-const int num_threads = 1;
+const int num_threads = 4;
 const int num_messages_per_thread = 10000;
 
 void LogMessages(Backend::Log::Logger& logger, int thread_id, int num_messages) {
@@ -13,10 +13,7 @@ void LogMessages(Backend::Log::Logger& logger, int thread_id, int num_messages) 
     }
 }
 
-void TestConsoleOutput() {
-    Backend::Log::Logger logger;
-    logger.AddPolicy(std::make_shared<Backend::Log::ConsoleLogPolicy>());
-
+void TestConsoleOutput(Backend::Log::Logger& logger) {
     std::vector<std::thread> threads;
 
 
@@ -32,10 +29,7 @@ void TestConsoleOutput() {
     logger.Flush();
 }
 
-void TestFileOutput() {
-    Backend::Log::Logger logger;
-    logger.AddPolicy(std::make_shared<Backend::Log::FileLogPolicy>("log.txt"));
-
+void TestFileOutput(Backend::Log::Logger& logger) {
     std::vector<std::thread> threads;
 
     for (int i = 0; i < num_threads; ++i) {
@@ -50,10 +44,8 @@ void TestFileOutput() {
 
 }
 
-void TestMixedOutput() {
-    Backend::Log::Logger logger;
-    logger.AddPolicy(std::make_shared<Backend::Log::FileLogPolicy>("log.txt"));
-    logger.AddPolicy(std::make_shared<Backend::Log::ConsoleLogPolicy>());
+void TestMixedOutput(Backend::Log::Logger& logger) {
+
 
 
     std::vector<std::thread> threads;
@@ -75,10 +67,13 @@ void TestMixedOutput() {
 }
 
 int main() {
+    Backend::Log::Logger logger;
+    logger.AddPolicy(std::make_shared<Backend::Log::FileLogPolicy>("log.txt"));
+//    logger.AddPolicy(std::make_shared<Backend::Log::ConsoleLogPolicy>());
     auto start_time = std::chrono::high_resolution_clock::now();
 //    TestConsoleOutput();
-//    TestFileOutput();
-    TestMixedOutput();
+    TestFileOutput(logger);
+//    TestMixedOutput();
     auto end_time = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed = end_time - start_time;
     std::cout << "Mixed Output Test: Logged " << num_threads * num_messages_per_thread << " messages in " << elapsed.count() << " seconds." << std::endl;

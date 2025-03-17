@@ -7,87 +7,65 @@
 #include <vector>
 #include <string>
 #include <atomic>
+#include <chrono>
+#include <mutex>
+#include <thread>
+#include <vector>
 
 namespace Backend::Log {
 
     class FileLogPolicy : public LogPolicy {
     public:
-        explicit FileLogPolicy(const std::string& file_path, size_t buffer_size = 512)
-            : file_path_(file_path), buffer_size_(buffer_size), current_buffer_(0) {
-            file_.open(file_path, std::ios::out | std::ios::app);
-            if (!file_.is_open()) {
-                throw std::runtime_error("Failed to open log file: " + file_path);
-            }
-            buffers_[0].reserve(buffer_size_);
-            buffers_[1].reserve(buffer_size_);
-        }
+        explicit FileLogPolicy(std::string  file_path, size_t buffer_size = 512);
+        ~FileLogPolicy() override;
 
-        ~FileLogPolicy() override {
-            Flush();
-            if (file_.is_open()) {
-                file_.close();
-            }
-        }
-
-        void Write(LogLevel level, const std::string& message) override {
-            std::lock_guard<std::mutex> lock(mutex_);
-            buffers_[current_buffer_].push_back(FormatMessage(level, message));
-            if (buffers_[current_buffer_].size() >= buffer_size_) {
-                SwapBuffers();
-                Flush();
-            }
-        }
-
-        void Flush() override {
-            // std::lock_guard<std::mutex> lock(mutex_);
-            if (!buffers_[!current_buffer_].empty()) {
-                for (const auto& msg : buffers_[!current_buffer_]) {
-                    file_ << msg << std::endl;
-                }
-                buffers_[!current_buffer_].clear();
-                file_.flush(); // 确保文件流被刷新
-            }
-        }
+        void Write(LogLevel level, const std::string& message) override;
+        void Flush() override;
 
     private:
-        std::ofstream file_;
-        std::mutex mutex_;
-        std::vector<std::string> buffers_[2];
-        std::string file_path_;
-        size_t buffer_size_;
-        std::atomic<int> current_buffer_;
+        struct alignas(64) BufferShard {
+            static constexpr size_t SHARD_SIZE = 1 << 18; // 2^18 = 262,144 (256KB)
+            alignas(64) std::array<std::string, SHARD_SIZE> messages;
+            alignas(64) std::atomic<size_t> head{0};
+            alignas(64) std::atomic<size_t> tail{0};
 
-        void SwapBuffers() {
-            current_buffer_ = !current_buffer_;
-        }
+            bool push(std::string &&msg) noexcept {
+                auto current_tail = tail.load(std::memory_order_relaxed);
+                auto next_tail = (current_tail + 1) & (SHARD_SIZE - 1);
 
-        static std::string FormatMessage(LogLevel level, const std::string& message) {
-            auto now = std::chrono::system_clock::now();
-            auto now_c = std::chrono::system_clock::to_time_t(now);
-            auto now_ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()) % 1000;
-            auto tm = *std::localtime(&now_c);
-            std::ostringstream oss;
-            oss << "[" << std::put_time(&tm, "%Y-%m-%d %H:%M:%S") << "." << std::setw(3) << std::setfill('0') << now_ms.count() << "] ";
-            switch (level) {
-                case LogLevel::Info:
-                    oss << "[INFO] ";
-                    break;
-                case LogLevel::Debug:
-                    oss << "[DEBUG] ";
-                    break;
-                case LogLevel::Error:
-                    oss << "[ERROR] ";
-                    break;
-                case LogLevel::Warning:
-                    oss << "[WARNING] ";
-                    break;
-                case LogLevel::Trace:
-                    oss << "[TRACE] ";
-                    break;
+                if (next_tail == head.load(std::memory_order_relaxed)) {
+                    return false;
+                }
+
+                messages[current_tail] = std::move(msg);
+                tail.store(next_tail, std::memory_order_release);
+                return true;
             }
-            oss << message;
-            return oss.str();
-        }
+
+            bool pop(std::string &msg) noexcept {
+                auto current_head = head.load(std::memory_order_relaxed);
+
+                if (current_head == tail.load(std::memory_order_relaxed)) {
+                    return false;
+                }
+
+                msg = std::move(messages[current_head]);
+                head.store((current_head + 1) & (SHARD_SIZE - 1), std::memory_order_release);
+                return true;
+            }
+        };
+
+        static constexpr size_t NUM_SHARDS = 4; // 4 shards (256KB * 4 = 1MB)
+        std::array<BufferShard, NUM_SHARDS> shards;
+        std::atomic<size_t> nextShardId{0};
+        std::jthread processingThread;
+        std::atomic<bool> running{true};
+        std::ofstream file_;
+        std::string file_path_;
+
+        void processLogs(std::stop_token st);
+        static std::string FormatMessage(LogLevel level, const std::string& message);
+        size_t getShardId() noexcept;
     };
 
 }
