@@ -1,10 +1,10 @@
-#include "Backend/Log/FileLogPolicy.hpp"
+#include "Utils/Log/FileLogPolicy.hpp"
 #include <iostream>
 #include <utility>
 #include <vector>
 #include <algorithm>
 
-namespace Backend::Log {
+namespace Utils::Log {
 
     FileLogPolicy::FileLogPolicy(std::string  file_path, size_t /*buffer_size*/)
         : file_path_(std::move(file_path)), running(true) {

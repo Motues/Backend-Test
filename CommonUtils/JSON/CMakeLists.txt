@@ -1,13 +1,12 @@
 cmake_minimum_required(VERSION 3.28)
 
-project(Backend.Log)
+project(Utils.JSON)
 
 AddCXXModule(
-    NAME "Log"
-    NAMESPACE "Backend"
+    NAME "JSON"
+    NAMESPACE "Utils"
     CXX_STANDARD "26"
     HEADER_DIR "include"
     SOURCE_DIR "src"
     TESTER_DIR "test"
-    LINKS
 )

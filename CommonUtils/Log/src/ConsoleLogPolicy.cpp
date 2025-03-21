@@ -1,11 +1,11 @@
-#include "Backend/Log/ConsoleLogPolicy.hpp"
+#include "Utils/Log/ConsoleLogPolicy.hpp"
 #include <iostream>
 #include <iomanip>
 #include <ctime>
 #include <chrono>
 #include <sstream>
 
-namespace Backend::Log {
+namespace Utils::Log {
 
     ConsoleLogPolicy::ConsoleLogPolicy() : stop_(false) {
         thread_ = std::thread(&ConsoleLogPolicy::ProcessQueue, this);

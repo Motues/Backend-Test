@@ -12,7 +12,7 @@
 #include <thread>
 #include <vector>
 
-namespace Backend::Log {
+namespace Utils::Log {
 
     class FileLogPolicy : public LogPolicy {
     public:

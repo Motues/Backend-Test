@@ -1,4 +1,4 @@
-# Backend Logging Library
+# Utils Logging Library
 
 基于C++11的高性能异步日志库，支持控制台彩色输出和文件日志。
 
@@ -13,10 +13,10 @@
 ## 快速开始
 
 ```c++
-#include <Backend/Log.hpp>
+#include <Utils/Log.hpp>
 
 int main() { 
-    using namespace Backend::Log;
+    using namespace Utils::Log;
     // 初始化日志系统
     Logger logger;
     logger.AddPolicy(std::make_shared<ConsoleLogPolicy>());

@@ -11,7 +11,7 @@
 #include <condition_variable>
 #include <atomic>
 
-namespace Backend::Log {
+namespace Utils::Log {
 
     class ConsoleLogPolicy : public LogPolicy {
     public:

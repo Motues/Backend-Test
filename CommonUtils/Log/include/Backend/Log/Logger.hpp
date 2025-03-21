@@ -10,7 +10,7 @@
 #include <sstream>
 #include <chrono>
 
-namespace Backend::Log {
+namespace Utils::Log {
 
     class Logger {
     public:

@@ -1,13 +1,13 @@
-#include "Backend/Log.hpp"
+#include "Utils/Log.hpp"
 
 
 int main() {
     // 创建日志策略
-    auto filePolicy = std::make_shared<Backend::Log::FileLogPolicy>("log.txt");
-    auto consolePolicy = std::make_shared<Backend::Log::ConsoleLogPolicy>();
+    auto filePolicy = std::make_shared<Utils::Log::FileLogPolicy>("log.txt");
+    auto consolePolicy = std::make_shared<Utils::Log::ConsoleLogPolicy>();
 
     // 初始化 Logger
-    Backend::Log::Logger logger;
+    Utils::Log::Logger logger;
     logger.AddPolicy(filePolicy);
     logger.AddPolicy(consolePolicy);
 

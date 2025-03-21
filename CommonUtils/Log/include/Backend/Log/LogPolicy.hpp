@@ -3,7 +3,7 @@
 #include <string>
 #include <mutex>
 
-namespace Backend::Log {
+namespace Utils::Log {
 
     enum class LogLevel {
         Trace,

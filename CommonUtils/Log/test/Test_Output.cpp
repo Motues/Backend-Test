@@ -1,4 +1,4 @@
-#include "Backend/Log.hpp"
+#include "Utils/Log.hpp"
 #include <iostream>
 #include <thread>
 #include <vector>
@@ -7,13 +7,13 @@
 const int num_threads = 4;
 const int num_messages_per_thread = 10000;
 
-void LogMessages(Backend::Log::Logger& logger, int thread_id, int num_messages) {
+void LogMessages(Utils::Log::Logger& logger, int thread_id, int num_messages) {
     for (int i = 0; i < num_messages; ++i) {
-        logger.Log(Backend::Log::LogLevel::Info, "Thread {} logging message {}", thread_id, i);
+        logger.Log(Utils::Log::LogLevel::Info, "Thread {} logging message {}", thread_id, i);
     }
 }
 
-void TestConsoleOutput(Backend::Log::Logger& logger) {
+void TestConsoleOutput(Utils::Log::Logger& logger) {
     std::vector<std::thread> threads;
 
 
@@ -29,7 +29,7 @@ void TestConsoleOutput(Backend::Log::Logger& logger) {
     logger.Flush();
 }
 
-void TestFileOutput(Backend::Log::Logger& logger) {
+void TestFileOutput(Utils::Log::Logger& logger) {
     std::vector<std::thread> threads;
 
     for (int i = 0; i < num_threads; ++i) {
@@ -44,7 +44,7 @@ void TestFileOutput(Backend::Log::Logger& logger) {
 
 }
 
-void TestMixedOutput(Backend::Log::Logger& logger) {
+void TestMixedOutput(Utils::Log::Logger& logger) {
 
 
 
@@ -67,9 +67,9 @@ void TestMixedOutput(Backend::Log::Logger& logger) {
 }
 
 int main() {
-    Backend::Log::Logger logger;
-    logger.AddPolicy(std::make_shared<Backend::Log::FileLogPolicy>("log.txt"));
-//    logger.AddPolicy(std::make_shared<Backend::Log::ConsoleLogPolicy>());
+    Utils::Log::Logger logger;
+    logger.AddPolicy(std::make_shared<Utils::Log::FileLogPolicy>("log.txt"));
+//    logger.AddPolicy(std::make_shared<Utils::Log::ConsoleLogPolicy>());
     auto start_time = std::chrono::high_resolution_clock::now();
 //    TestConsoleOutput();
     TestFileOutput(logger);

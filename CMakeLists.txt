@@ -18,9 +18,16 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 #find_package(Boost REQUIRED COMPONENTS system filesystem json program_options)
 
 AddModulesInDirectory(
+    DIRECTORY "CommonUtils"
+    NAMES
+        "JSON"
+        "Log"
+)
+
+
+AddModulesInDirectory(
     DIRECTORY "Modules"
     NAMES
-        "Log"
         "BasicType"
         "WebUtils"
 
