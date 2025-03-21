@@ -11,4 +11,6 @@ AddCXXModule(
     TESTER_DIR "test"
     LINKS
         Backend::BasicType
+        Boost::system
+        Utils::MessageQueue
 )

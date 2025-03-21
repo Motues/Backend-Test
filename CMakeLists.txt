@@ -9,19 +9,21 @@ endif()
 
 project(Backend)
 
-#include(/home/motues/vcpkg/scripts/buildsystems/vcpkg.cmake)
+include(/home/motues/vcpkg/scripts/buildsystems/vcpkg.cmake)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-#find_package(Boost REQUIRED COMPONENTS system filesystem json program_options)
+find_package(Boost REQUIRED COMPONENTS system filesystem json program_options thread)
+find_package(spdlog)
 
 AddModulesInDirectory(
     DIRECTORY "CommonUtils"
     NAMES
         "JSON"
         "Log"
+        "MessageQueue"
 )
 
 

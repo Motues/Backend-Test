@@ -3,7 +3,7 @@
 #include "Backend/WebUtils.hpp"
 
 void RunClient() {
-    Utils::TCP::SingleTCPClient client("127.0.0.1", 1717, Utils::IPType::IPV4, 1024);
+    Utils::TCP::SingleTCPClient client("127.0.0.1", 1717, Utils::IPType::IPV4);
     if (!client.ConnectToServer()) {
         std::cerr << "Failed to connect to server." << std::endl;
         return;
@@ -27,10 +27,10 @@ void RunClient() {
         }
 
         // 接收服务器响应
-        std::string response;
-        if (client.RecvData(response)) {
-            std::cout << "Server response: " << response << std::endl;
-        }
+//        std::string response;
+//        if (client.RecvData(response)) {
+//            std::cout << "Server response: " << response << std::endl;
+//        }
     }
 }
 
