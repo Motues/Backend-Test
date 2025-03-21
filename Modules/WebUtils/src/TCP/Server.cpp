@@ -240,21 +240,21 @@ bool AsyncTCPServer::StartServer() {
 //}
 
 void AsyncTCPServer::StartRead(const TCPClientPtr& clientPtr) {
-    auto buffer = std::make_shared<boost::asio::streambuf>();
-
+    auto buffer = std::make_shared<std::array<char, 1024>>();
     clientPtr->socket.async_read_some(
-        boost::asio::buffer(clientPtr->buffer),
-        [this, clientPtr](const BoostErrorCode& ec, std::size_t bytes_transferred) {
+        boost::asio::buffer(*buffer),
+        [this, clientPtr, buffer](const BoostErrorCode& ec, std::size_t bytes_transferred) {
                 if (!ec) {
+                    std::string data(buffer->data(), bytes_transferred);
                     // 将接收到的数据直接存入消息队列
+                    std::cout << "Received data from client " << clientPtr->address << ":" << clientPtr->port << std::endl;
                     TCPMessage msg;
                     msg.type = MessageType::DATA;
-                    msg.data = std::string(clientPtr->buffer.data(), bytes_transferred);
+                    msg.data = data;
                     msg.time = std::chrono::system_clock::now();
                     messageQueue.push(msg);
 
                     // 清空缓冲区并继续读取
-                    clientPtr->buffer.fill(0);
                     StartRead(clientPtr);
                 } else {
                     if (ec != boost::asio::error::eof) {

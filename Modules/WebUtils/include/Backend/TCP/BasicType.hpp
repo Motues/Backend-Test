@@ -10,6 +10,7 @@ namespace Utils {
     using BoostErrorCode = boost::system::error_code;
     using BoostStreamBuffer = boost::asio::streambuf;
     using BoostConstBuffer = boost::asio::const_buffer;
+    using BoostMutableBuffer = boost::asio::mutable_buffer;
 
     enum class IPType{
         IPV4 = 0,
@@ -38,7 +39,6 @@ namespace Utils :: TCP {
         TCPSocket socket;
         std::string address;
         int port{0};
-        std::array<char, 1024> buffer{};
 
         explicit TCPClient(IOContext &ioContext) :
             socket(TCPSocket (ioContext)) {}
