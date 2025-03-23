@@ -1,80 +1,83 @@
-# pragma once
+#pragma once
 
-#include <iostream>
-#include <string>
-#include <cstring>
-
+#include <memory>
 #include <vector>
+#include <queue>
+#include <iostream>
 
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <unistd.h>
-#include <sys/select.h>
+#include "BasicType.hpp"
 
-#include "Backend/BasicType.hpp"
+#include "Utils/MessageQueue.hpp"
 
-namespace Utils :: TCP{
+namespace Utils :: TCP {
 
-    class SingleTCPServer {
-    public:
-        SingleTCPServer();
-        explicit SingleTCPServer(int port);
-        explicit SingleTCPServer(std::string serverAddress);
-        SingleTCPServer(int port, std::string serverAddress);
-        SingleTCPServer(int port, std::string serverAddress, int bufferSize);
-        SingleTCPServer(int port, IPType ipType, int bufferSize);
-        SingleTCPServer(int port, IPType ipType, int bufferSize, std::string  serverAddress);
-        ~SingleTCPServer();
+using Utils::MessageQueue::MessageQueue;
 
-        bool CreateServer();
-        bool BindPort();
-        bool ListenServer();
-        bool AcceptClient();
-        [[nodiscard]] bool SendData(const std::string& data) const;
-        [[nodiscard]] bool RecData(std::string& data);
+class SingleTCPServer {
+public:
+    SingleTCPServer();
+    SingleTCPServer(int port);
+    SingleTCPServer(std::string serverAddress);
+    SingleTCPServer(int port, std::string serverAddress);
+    SingleTCPServer(int port, IPType ipType);
+    SingleTCPServer(int port, std::string serverAddress, IPType ipType);
+    ~SingleTCPServer();
 
-        bool CloseServer();
-        bool CloseClient();
+    bool CreateServer();
+    bool BindPort();
+    bool ListenServer();
+    bool AcceptClient();
+    bool SendData(const std::string& data) const;
+    bool RecData(std::string& data);
 
-    private:
-        int port{1717};
-        IPType ipType{IPType::IPV4};
-        int bufferSize{1024};
-        int serverSocket{-1};
-        int clientSocket{-1};
-        std::string serverAddress{"127.0.0.1"};
-    };
+    bool CloseServer();
+    bool CloseClient();
 
-    class AsyncTCPServer {
-    public:
-        AsyncTCPServer();
-        explicit AsyncTCPServer(int port);
-        explicit AsyncTCPServer(std::string serverAddress);
-        AsyncTCPServer(int port, std::string serverAddress);
-        AsyncTCPServer(int port, std::string serverAddress, int bufferSize);
-        AsyncTCPServer(int port, IPType ipType, int bufferSize);
-        AsyncTCPServer(int port, IPType ipType, int bufferSize, std::string  serverAddress);
-        ~AsyncTCPServer();
+private:
+    int port{1717};
+    std::string serverAddress{"127.0.0.1"};
+    IPType ipType{IPType::IPV4};
+    IOContextPtr ioContextPtr;
+    TCPAcceptorPtr acceptorPtr;
+    TCPClientPtr clientPtr;
+};
 
-        bool CreateServer();
-        bool BindPort();
-        bool ListenServer();
-        bool AcceptClient();
-        bool AsyncHandleClient();
-        bool SingleHandleClient(int &clientSocket);
-        [[nodiscard]] bool SendData(const std::string& data, int clientSocket) const;
-        [[nodiscard]] bool RecData(std::string& data, int clientSocket);
+class AsyncTCPServer {
+public:
+    AsyncTCPServer();
+    AsyncTCPServer(int port);
+    AsyncTCPServer(std::string serverAddress);
+    AsyncTCPServer(int port, std::string serverAddress);
+    AsyncTCPServer(int port, IPType ipType);
+    AsyncTCPServer(int port, std::string serverAddress, IPType ipType);
+    ~AsyncTCPServer();
 
-        bool CloseServer();
-        bool CloseClient(int &clientSocket);
+    bool CreateServer();
+    bool BindPort();
+    bool ListenServer();
+    bool AcceptClient();
+    bool SendData(const std::string& data, TCPClientPtr& clientPtr) const;
+    bool RecData(std::string& data, TCPClientPtr& clientPtr);
+    bool GetMessage(TCPMessage &message);
 
-    private:
-        int port{1717};
-        IPType ipType{IPType::IPV4};
-        int bufferSize{1024};
-        int serverSocket{-1};
-        std::vector<int> clientSockets;
-        std::string serverAddress{"127.0.0.1"};
-    };
+    bool StartServer();
+
+    bool CloseServer();
+    bool CloseClient(const TCPClientPtr& clientPtr);
+
+private:
+    int port{1717};
+    std::string serverAddress{"127.0.0.1"};
+    IPType ipType{IPType::IPV4};
+    int maxClientsNumber{1024};
+    IOContextPtr ioContextPtr;
+    TCPAcceptorPtr acceptorPtr;
+    std::vector<TCPClientPtr> clientsPtr;
+    MessageQueue<TCPMessage> messageQueue;
+    std::thread serverThread;
+
+    void DoAccept();
+    void StartRead(const TCPClientPtr& clientPtr);
+};
 
 }
