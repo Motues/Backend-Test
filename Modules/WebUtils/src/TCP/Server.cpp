@@ -25,7 +25,8 @@ SingleTCPServer::~SingleTCPServer() {
 bool SingleTCPServer::CreateServer() {
     ioContextPtr = std::make_shared<IOContext>();
     acceptorPtr = std::make_shared<TCPAcceptor>(*ioContextPtr);
-    if (!ioContextPtr || !acceptorPtr) {
+    clientPtr = std::make_shared<TCPClient>(*ioContextPtr);
+    if (!ioContextPtr || !acceptorPtr || !clientPtr) {
         std::cerr << "Failed to create io_context" << std::endl;
         return false;
     }

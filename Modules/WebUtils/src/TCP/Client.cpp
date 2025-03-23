@@ -74,7 +74,9 @@ bool SingleTCPClient::RecvData(std::string& data) {
         std::cerr << "Failed to receive data: " << ec.message() << std::endl;
         return false;
     }
-    data = std::string(boost::asio::buffer_cast<const char*>(buffer.data()), bytes_transferred);
+    const boost::asio::const_buffer data_buffer = buffer.data();
+    data = std::string(static_cast<const char*>(data_buffer.data()), bytes_transferred);
+//    data = std::string(boost::asio::buffer_cast<const char*>(buffer.data()), bytes_transferred);
     std::cout << "Data received: " << data << std::endl;
     return true;
 }

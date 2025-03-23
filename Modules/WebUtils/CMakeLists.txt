@@ -10,7 +10,6 @@ AddCXXModule(
     SOURCE_DIR "src"
     TESTER_DIR "test"
     LINKS
-        Backend::BasicType
         Boost::system
         Utils::MessageQueue
 )
