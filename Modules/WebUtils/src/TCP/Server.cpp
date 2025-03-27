@@ -56,7 +56,7 @@ bool SingleTCPServer::BindPort() {
 
 bool SingleTCPServer::ListenServer() {
     BoostErrorCode ec;
-    acceptorPtr->listen(boost::asio::socket_base::max_connections, ec);
+    acceptorPtr->listen(maxClientsNumber, ec);
     if (ec) {
         std::cerr << "Listen failed: " << ec.message() << std::endl;
         return false;
@@ -119,7 +119,8 @@ bool SingleTCPServer::RecData(std::string& data) {
         std::cerr << "Failed to receive data: " << ec.message() << std::endl;
         return false;
     }
-    data = std::string(boost::asio::buffer_cast<const char*>(buffer.data()), bytes_transferred);
+    data = std::string(static_cast<const char*>(buffer.data().data()), bytes_transferred);
+//    data = std::string(boost::asio::buffer_cast<const char*>(buffer.data()), bytes_transferred);
     std::cout << "Data received: " << data << std::endl;
     return true;
 }
@@ -198,7 +199,7 @@ bool AsyncTCPServer::BindPort() {
 }
 bool AsyncTCPServer::ListenServer() {
     BoostErrorCode ec;
-    acceptorPtr->listen(boost::asio::socket_base::max_connections, ec);
+    acceptorPtr->listen(maxClientsNumber, ec);
     if (ec) {
         std::cerr << "Listen failed: " << ec.message() << std::endl;
         return false;
@@ -340,7 +341,9 @@ bool AsyncTCPServer::RecData(std::string& data, TCPClientPtr& clientPtr) {
         std::cerr << "Failed to receive data: " << ec.message() << std::endl;
         return false;
     }
-    data = std::string(boost::asio::buffer_cast<const char*>(buffer.data()), bytes_transferred);
+    const boost::asio::const_buffer data_buffer = buffer.data();
+    data = std::string(static_cast<const char*>(data_buffer.data()), bytes_transferred);
+//    data = std::string(boost::asio::buffer_cast<const char*>(buffer.data()), bytes_transferred);
     std::cout << "Data received: " << data << std::endl;
     return true;
 }

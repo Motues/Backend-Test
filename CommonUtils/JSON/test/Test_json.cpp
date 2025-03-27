@@ -2,39 +2,55 @@
 #include <string>
 #include "Utils/json.hpp"
 
+using namespace Utils::JSON;
 int main() {
-    std::string jsonString = R"({
-        "name": "Alice",
-        "age": 25,
-        "isStudent": false,
-        "courses": ["Math", "Physics"],
-        "grades": {"Math": 90, "Physics": 85}
+    // 构造JSON
+    std::string data = R"({
+        "name": "John",
+        "age": 30,
+        "scores": [95.5, 88.0, null],
     })";
 
-    try {
-        Utils::JSON::Value parsedValue = Utils::JSON::Parser::parse(jsonString);
+    // 解析JSON
+    JsonParser parser;
+    JsonValue parsed = parser.parse(data);
 
-        // 示例：访问解析后的值
-        if (parsedValue.type() == typeid(std::map<std::string, Utils::JSON::Value>)) {
-            auto obj = std::any_cast<std::map<std::string, Utils::JSON::Value>>(parsedValue);
-            std::cout << "Name: " << std::any_cast<std::string>(obj.at("name")) << std::endl;
-            std::cout << "Age: " << std::any_cast<int>(obj.at("age")) << std::endl;
-            std::cout << "Is Student: " << std::any_cast<bool>(obj.at("isStudent")) << std::endl;
 
-            auto courses = std::any_cast<std::vector<Utils::JSON::Value>>(obj.at("courses"));
-            std::cout << "Courses: ";
-            for (const auto& course : courses) {
-                std::cout << std::any_cast<std::string>(course) << " ";
+    // 访问scores数组
+    if (auto scores = parsed.get<std::vector<JsonValue>>()) {
+        std::cout << "Scores: ";
+        for (const auto& score : *scores) {
+            if (auto num = score.get<double>()) {
+                std::cout << *num << " ";
+            } else if (score.get<std::monostate>()) {
+                std::cout << "null ";
             }
-            std::cout << std::endl;
-
-            auto grades = std::any_cast<std::map<std::string, Utils::JSON::Value>>(obj.at("grades"));
-            std::cout << "Grades: " << std::any_cast<int>(grades.at("Math")) << ", "
-                      << std::any_cast<int>(grades.at("Physics")) << std::endl;
         }
-    } catch (const std::exception& e) {
-        std::cerr << "Error: " << e.what() << std::endl;
+        std::cout << std::endl;
     }
 
-    return 0;
+    // 访问metadata对象
+    if (auto metadata = parsed.get<JsonValue::Object>()) {
+        std::cout << "Metadata:" << std::endl;
+        for (const auto& [key, value] : *metadata) {
+            std::cout << "  " << key << ": ";
+            if (auto str = value.get<JsonValue::String>()) {
+                std::cout << *str;
+            } else if (auto num = value.get<JsonValue::Number>()) {
+                std::cout << *num;
+            } else if (auto bool_val = value.get<JsonValue::Boolean>()) {
+                std::cout << (*bool_val ? "true" : "false");
+            } else if (auto arr = value.get<JsonValue::Array>()) {
+                std::cout << "[";
+                for (const auto& item : *arr) {
+                    if (auto item_str = item.get<JsonValue::Number>()) {
+                        std::cout << *item_str << " ";
+                    }
+                }
+                std::cout << "]";
+            }
+            std::cout << std::endl;
+        }
+    }
+
 }

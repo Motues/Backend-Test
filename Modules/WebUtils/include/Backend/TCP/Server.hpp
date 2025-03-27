@@ -37,6 +37,7 @@ private:
     int port{1717};
     std::string serverAddress{"127.0.0.1"};
     IPType ipType{IPType::IPV4};
+    int maxClientsNumber{1024};
     IOContextPtr ioContextPtr;
     TCPAcceptorPtr acceptorPtr;
     TCPClientPtr clientPtr;
