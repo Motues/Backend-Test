@@ -4,12 +4,12 @@
 #include <vector>
 #include <chrono>
 
-const int num_threads = 4;
+const int num_threads = 1;
 const int num_messages_per_thread = 10000;
 
 void LogMessages(Utils::Log::Logger& logger, int thread_id, int num_messages) {
     for (int i = 0; i < num_messages; ++i) {
-        logger.Log(Utils::Log::LogLevel::Info, "Thread {} logging message {}", thread_id, i);
+        logger.Info("Thread {}: Message {}", thread_id, i);
     }
 }
 
@@ -77,6 +77,6 @@ int main() {
     auto end_time = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed = end_time - start_time;
     std::cout << "Mixed Output Test: Logged " << num_threads * num_messages_per_thread << " messages in " << elapsed.count() << " seconds." << std::endl;
-    std::cout << "Speed: " << static_cast<double>(num_threads * num_messages_per_thread) / elapsed.count() << " messages/second" << std::endl;
+    std::cout << "Speed: " << int(static_cast<double >(num_threads * num_messages_per_thread) / elapsed.count() )<< " messages/second" << std::endl;
     return 0;
 }

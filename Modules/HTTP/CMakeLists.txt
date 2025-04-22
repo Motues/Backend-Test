@@ -12,4 +12,5 @@ AddCXXModule(
     LINKS
         Boost::system
         Utils::MessageQueue
+        nlohmann_json::nlohmann_json
 )

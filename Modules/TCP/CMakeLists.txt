@@ -1,14 +1,15 @@
 cmake_minimum_required(VERSION 3.28)
 
-project(Utils.Log)
+project(Backend.TCP)
 
 AddCXXModule(
-    NAME "Log"
-    NAMESPACE "Utils"
+    NAME "TCP"
+    NAMESPACE "Backend"
     CXX_STANDARD "26"
     HEADER_DIR "include"
     SOURCE_DIR "src"
     TESTER_DIR "test"
     LINKS
-        Utils::ThreadPool
+        Boost::system
+        Utils::MessageQueue
 )

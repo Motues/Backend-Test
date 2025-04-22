@@ -1,115 +1,78 @@
 #include "Utils/Log/FileLogPolicy.hpp"
-#include <iostream>
-#include <utility>
-#include <vector>
-#include <algorithm>
+
 
 namespace Utils::Log {
 
-    FileLogPolicy::FileLogPolicy(std::string  file_path, size_t /*buffer_size*/)
-        : file_path_(std::move(file_path)), running(true) {
-        file_.open(file_path_, std::ios::out | std::ios::app);
-        if (!file_.is_open()) {
-            throw std::runtime_error("Failed to open log file: " + file_path_);
-        }
-
-        processingThread = std::jthread([this](std::stop_token st) {
-            this->processLogs(st);
-        });
+FileLogPolicy::FileLogPolicy(const std::string &file_path) : file_path_(file_path) {
+    file_ptr_ = std::make_unique<std::ofstream>();
+    buffer_size_ = 1024;
+    file_ptr_->open(file_path, std::ios::out | std::ios::app);
+    if (!file_ptr_->is_open()) {
+        throw std::runtime_error("Failed to open log file: " + file_path);
     }
-
-    FileLogPolicy::~FileLogPolicy() {
-        running = false;
-        if (processingThread.joinable()) {
-            processingThread.request_stop();
-            processingThread.join();
-        }
+    buffers_[0].reserve(buffer_size_);
+    buffers_[1].reserve(buffer_size_);
+}
+FileLogPolicy::~FileLogPolicy() {
+    Flush();
+    if (file_ptr_->is_open()) {
+        file_ptr_->close();
+    }
+    thread_pool_.;
+}
+void FileLogPolicy::SwapBuffers() {
+    current_buffer_ = !current_buffer_;
+}
+void FileLogPolicy::Write(Utils::Log::LogLevel level, const std::string &message) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    buffers_[current_buffer_].push_back(FormatMessage(level, message));
+    if (buffers_[current_buffer_].size() >= buffer_size_) {
+        SwapBuffers();
         Flush();
-        if (file_.is_open()) {
-            file_.close();
-        }
     }
-
-    void FileLogPolicy::Write(LogLevel level, const std::string& message) {
-        std::string formattedMessage = FormatMessage(level, message);
-        size_t shardId = getShardId();
-
-        for (size_t attempt = 0; attempt < NUM_SHARDS; ++attempt) {
-            if (shards[shardId].push(std::move(formattedMessage))) {
-                return;
+}
+/*
+ * 逻辑还需要修改
+ */
+void FileLogPolicy::Flush() {
+    // std::lock_guard<std::mutex> lock(mutex_);
+    if (!buffers_[!current_buffer_].empty()) {
+        auto buffers_ptr = std::make_shared<std::vector<std::string>>(buffers_[!current_buffer_]);
+        thread_pool_.enqueue([this, buffers_ptr]() {
+            for (const auto& msg : *buffers_ptr) {
+                file_ptr_->write(msg.c_str(), msg.size());
             }
-            shardId = (shardId + 1) % NUM_SHARDS;
-        }
-
-        // Fallback to direct write if all shards are full
-        file_ << formattedMessage << std::endl;
-        file_.flush();
+            file_ptr_->flush(); // 确保文件流被刷新
+        });
+        buffers_[!current_buffer_].clear();
     }
+}
 
-    void FileLogPolicy::Flush() {
-        for (auto& shard : shards) {
-            std::string msg;
-            while (shard.pop(msg)) {
-                file_ << msg << std::endl;
-            }
-        }
-        file_.flush();
-    }
-
-    void FileLogPolicy::processLogs(std::stop_token st) {
-        std::vector<std::string> batchBuffer;
-        batchBuffer.reserve(4096);
-
-        while (!st.stop_requested()) {
-            bool messagesProcessed = false;
-
-            for (size_t i = 0; i < NUM_SHARDS; ++i) {
-                std::string msg;
-                while (shards[i].pop(msg)) {
-                    batchBuffer.push_back(std::move(msg));
-                    messagesProcessed = true;
-                }
-            }
-
-            if (!batchBuffer.empty()) {
-                for (const auto& msg : batchBuffer) {
-                    file_ << msg << std::endl;
-                }
-                file_.flush();
-                batchBuffer.clear();
-            }
-
-            if (!messagesProcessed) {
-                std::this_thread::sleep_for(std::chrono::microseconds(100));
-            }
-        }
-    }
-
-    static std::string GetLogLevelString(LogLevel level) {
-        switch (level) {
-        case LogLevel::Debug:
-            return "DEBUG";
-        case LogLevel::Error:
-            return "ERROR";
+std::string FileLogPolicy::FormatMessage(LogLevel level, const std::string& message) {
+    auto now = std::chrono::system_clock::now();
+    auto now_c = std::chrono::system_clock::to_time_t(now);
+    auto now_ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()) % 1000;
+    auto tm = *std::localtime(&now_c);
+    std::ostringstream oss;
+    oss << "[" << std::put_time(&tm, "%Y-%m-%d %H:%M:%S") << "." << std::setw(3) << std::setfill('0') << now_ms.count() << "] ";
+    switch (level) {
         case LogLevel::Info:
-            return "INFO";
-        case LogLevel::Trace:
-            return "TRACE";
+            oss << "[INFO] ";
+            break;
+        case LogLevel::Debug:
+            oss << "[DEBUG] ";
+            break;
+        case LogLevel::Error:
+            oss << "[ERROR] ";
+            break;
         case LogLevel::Warning:
-            return "WARNING";
-        default:
-            return "UNKNOWN";
-        }
+            oss << "[WARNING] ";
+            break;
+        case LogLevel::Trace:
+            oss << "[TRACE] ";
+            break;
     }
-
-    std::string FileLogPolicy::FormatMessage(LogLevel level, const std::string& message) {
-        std::ostringstream oss;
-        oss << "[" << GetLogLevelString(level) << "] " << message << std::endl;
-        return oss.str();
-    }
-
-    size_t FileLogPolicy::getShardId() noexcept {
-        return nextShardId.fetch_add(1, std::memory_order_relaxed) % NUM_SHARDS;
-    }
-
+    oss << message << std::endl;
+    return oss.str();
+}
 }

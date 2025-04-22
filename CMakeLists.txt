@@ -28,22 +28,23 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-find_package(Boost REQUIRED COMPONENTS system)
-find_package(spdlog REQUIRED)
+#find_package(Boost REQUIRED COMPONENTS system)
+#find_package(spdlog REQUIRED)
+#find_package(nlohmann_json CONFIG REQUIRED)
 
 AddModulesInDirectory(
     DIRECTORY "CommonUtils"
     NAMES
+        "ThreadPool"
         "JSON"
         "Log"
         "MessageQueue"
+
 )
 
 
 AddModulesInDirectory(
     DIRECTORY "Modules"
     NAMES
-        "WebUtils"
-
 )
 
