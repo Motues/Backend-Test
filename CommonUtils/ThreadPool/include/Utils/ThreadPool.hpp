@@ -17,7 +17,7 @@ public:
 private:
     std::queue<std::function<void()>> tasks;  // 任务队列
     std::vector<std::thread> workers;         // 工作线程集合
-    std::mutex task_mutex;                   // 保护任务队列的互斥锁
+    std::mutex task_mutex;                    // 保护任务队列的互斥锁
     std::condition_variable condition;        // 条件变量，用于线程间通信
     bool stop_pool;
     int max_task_num, cur_task_num;

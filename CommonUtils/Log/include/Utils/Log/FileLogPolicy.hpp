@@ -3,6 +3,7 @@
 #include "LogPolicy.hpp"
 #include "Utils/ThreadPool.hpp"
 
+#include <iostream>
 #include <fstream>
 #include <ctime>
 #include <mutex>
@@ -10,6 +11,7 @@
 #include <string>
 #include <atomic>
 #include <iomanip>
+#include <condition_variable> // 新增头文件
 
 namespace Utils::Log {
 
@@ -18,7 +20,6 @@ public:
     FileLogPolicy(const std::string& file_path);
     ~FileLogPolicy() override;
 
-    void SwapBuffers();
     void Write(LogLevel level, const std::string& message) override;
     void Flush() override;
 
@@ -26,10 +27,19 @@ private:
     std::shared_ptr<std::ofstream> file_ptr_;
     std::mutex mutex_;
     std::string file_path_;
-    std::vector<std::string> buffers_[2];
-    size_t buffer_size_;
-    std::atomic<int> current_buffer_;
-    ThreadPool::ThreadPool thread_pool_;
+    std::vector<std::string> buffers_[16]; // 16个环形缓冲池
+    std::array<bool, 16> buffer_is_empty_; // 缓冲区是否为空
+    std::array<std::mutex, 16> mutex_buffers_; // 缓冲区加锁
+    size_t buffer_size_{65536}; // 缓冲区大小
+    std::atomic<int> current_buffer_; // 当前缓冲区
+    std::queue<int> queue_buffers_; // 等待写入的缓冲区
+    std::mutex mutex_queue_;
+    std::atomic<bool> stop_thread_; // 线程控制信号
+    std::thread thread_; // 文件写入线程
+    std::condition_variable cv_; // 新增条件变量
+    bool buffer_ready_{false}; // 新增标志位，表示缓冲区是否准备好
+    void NextBuffer();
+    void WriteToFile();
     static std::string FormatMessage(LogLevel level, const std::string& message);
 };
 

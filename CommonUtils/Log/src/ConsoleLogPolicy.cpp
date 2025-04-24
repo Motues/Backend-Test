@@ -62,24 +62,45 @@ namespace Utils::Log {
         auto now_ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()) % 1000;
         auto tm = *std::localtime(&now_c);
         std::ostringstream oss;
+#ifdef __linux__
         oss << "\033[32m[" << std::put_time(&tm, "%Y-%m-%d %H:%M:%S") << "." << std::setw(3) << std::setfill('0') << now_ms.count() << "]\033[0m ";
         switch (level) {
             case LogLevel::Info:
                 oss << "\033[32m[INFO] \033[0m";
-                break;
+            break;
             case LogLevel::Debug:
                 oss << "\033[34m[DEBUG] \033[0m";
-                break;
+            break;
             case LogLevel::Error:
                 oss << "\033[31m[ERROR] \033[0m";
-                break;
+            break;
             case LogLevel::Warning:
                 oss << "\033[33m[WARNING] \033[0m";
-                break;
+            break;
             case LogLevel::Trace:
                 oss << "\033[36m[TRACE] \033[0m";
+            break;
+    }
+#elif _WIN32
+        oss << "[" << std::put_time(&tm, "%Y-%m-%d %H:%M:%S") << "." << std::setw(3) << std::setfill('0') << now_ms.count() << "] ";
+        switch (level) {
+            case LogLevel::Info:
+                oss << "[INFO] ";
+                break;
+            case LogLevel::Debug:
+                oss << "[DEBUG] ";
+                break;
+            case LogLevel::Error:
+                oss << "[ERROR] ";
+                break;
+            case LogLevel::Warning:
+                oss << "[WARNING] ";
+                break;
+            case LogLevel::Trace:
+                oss << "[TRACE] ";
                 break;
         }
+#endif
         oss << message;
         return oss.str();
     }

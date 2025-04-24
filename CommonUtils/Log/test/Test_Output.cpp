@@ -4,8 +4,8 @@
 #include <vector>
 #include <chrono>
 
-const int num_threads = 1;
-const int num_messages_per_thread = 10000;
+const int num_threads = 8;
+const int num_messages_per_thread = 200000;
 
 void LogMessages(Utils::Log::Logger& logger, int thread_id, int num_messages) {
     for (int i = 0; i < num_messages; ++i) {
@@ -46,8 +46,6 @@ void TestFileOutput(Utils::Log::Logger& logger) {
 
 void TestMixedOutput(Utils::Log::Logger& logger) {
 
-
-
     std::vector<std::thread> threads;
 
 
@@ -59,11 +57,7 @@ void TestMixedOutput(Utils::Log::Logger& logger) {
     for (auto& thread : threads) {
         thread.join();
     }
-
-
-
     logger.Flush();
-
 }
 
 int main() {
