@@ -5,7 +5,7 @@
 #include <chrono>
 
 const int num_threads = 8;
-const int num_messages_per_thread = 200000;
+const int num_messages_per_thread = 1000;
 
 void LogMessages(Utils::Log::Logger& logger, int thread_id, int num_messages) {
     for (int i = 0; i < num_messages; ++i) {
@@ -15,45 +15,31 @@ void LogMessages(Utils::Log::Logger& logger, int thread_id, int num_messages) {
 
 void TestConsoleOutput(Utils::Log::Logger& logger) {
     std::vector<std::thread> threads;
-
-
     for (int i = 0; i < num_threads; ++i) {
         threads.emplace_back(LogMessages, std::ref(logger), i, num_messages_per_thread);
     }
-
     for (auto& thread : threads) {
         thread.join();
     }
-
-
     logger.Flush();
 }
 
 void TestFileOutput(Utils::Log::Logger& logger) {
     std::vector<std::thread> threads;
-
     for (int i = 0; i < num_threads; ++i) {
         threads.emplace_back(LogMessages, std::ref(logger), i, num_messages_per_thread);
     }
-
     for (auto& thread : threads) {
         thread.join();
     }
-
     logger.Flush();
-
 }
 
 void TestMixedOutput(Utils::Log::Logger& logger) {
-
     std::vector<std::thread> threads;
-
-
-
     for (int i = 0; i < num_threads; ++i) {
         threads.emplace_back(LogMessages, std::ref(logger), i, num_messages_per_thread);
     }
-
     for (auto& thread : threads) {
         thread.join();
     }
@@ -63,11 +49,11 @@ void TestMixedOutput(Utils::Log::Logger& logger) {
 int main() {
     Utils::Log::Logger logger;
     logger.AddPolicy(std::make_shared<Utils::Log::FileLogPolicy>("log.txt"));
-//    logger.AddPolicy(std::make_shared<Utils::Log::ConsoleLogPolicy>());
+    logger.AddPolicy(std::make_shared<Utils::Log::ConsoleLogPolicy>());
     auto start_time = std::chrono::high_resolution_clock::now();
-//    TestConsoleOutput();
-    TestFileOutput(logger);
-//    TestMixedOutput();
+    // TestConsoleOutput(logger);
+    // TestFileOutput(logger);
+    TestMixedOutput(logger);
     auto end_time = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed = end_time - start_time;
     std::cout << "Mixed Output Test: Logged " << num_threads * num_messages_per_thread << " messages in " << elapsed.count() << " seconds." << std::endl;

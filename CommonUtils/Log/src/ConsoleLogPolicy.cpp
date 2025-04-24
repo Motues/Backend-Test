@@ -6,7 +6,6 @@
 #include <sstream>
 
 namespace Utils::Log {
-
     ConsoleLogPolicy::ConsoleLogPolicy() : stop_(false) {
         thread_ = std::thread(&ConsoleLogPolicy::ProcessQueue, this);
     }
@@ -67,19 +66,19 @@ namespace Utils::Log {
         switch (level) {
             case LogLevel::Info:
                 oss << "\033[32m[INFO] \033[0m";
-            break;
+                break;
             case LogLevel::Debug:
                 oss << "\033[34m[DEBUG] \033[0m";
-            break;
+                break;
             case LogLevel::Error:
                 oss << "\033[31m[ERROR] \033[0m";
-            break;
+                break;
             case LogLevel::Warning:
                 oss << "\033[33m[WARNING] \033[0m";
-            break;
+                break;
             case LogLevel::Trace:
                 oss << "\033[36m[TRACE] \033[0m";
-            break;
+                break;
     }
 #elif _WIN32
         oss << "[" << std::put_time(&tm, "%Y-%m-%d %H:%M:%S") << "." << std::setw(3) << std::setfill('0') << now_ms.count() << "] ";
