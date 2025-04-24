@@ -1,0 +1,33 @@
+name: C++ CI (Compile and Test)
+
+on:
+  # 触发条件：推送代码到 main 分支或创建 Pull Request
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest  # 使用最新的 Ubuntu 环境
+
+    steps:
+      # 检出代码
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 安装依赖（如 g++、cmake 等）
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y g++ cmake make
+
+      # 配置并构建项目（假设使用 CMake）
+      - name: Configure and build
+        run: |
+          mkdir build
+          cd build
+          cmake ..
+          make

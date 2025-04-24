@@ -10,17 +10,15 @@ endif()
 
 project(Backend)
 
-if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
-    message(STATUS "Building on Windows")
-    include(D:/Soft/vcpkg/scripts/buildsystems/vcpkg.cmake)
-#    set(CMAKE_TOOLCHAIN_FILE D:/Soft/vcpkg/scripts/buildsystems/vcpkg.cmake)
-#    set(VCPKG_TARGET_TRIPLET x64-mingw-static)
-elseif (CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    message(STATUS "Building on Linux")
-    include(/home/motues/vcpkg/scripts/buildsystems/vcpkg.cmake)
-else()
-    message(FATAL_ERROR "Unsupported system: ${CMAKE_SYSTEM_NAME}")
-endif()
+#if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
+#    message(STATUS "Building on Windows")
+#    include(D:/Soft/vcpkg/scripts/buildsystems/vcpkg.cmake)
+#elseif (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+#    message(STATUS "Building on Linux")
+#    include(/home/motues/vcpkg/scripts/buildsystems/vcpkg.cmake)
+#else()
+#    message(FATAL_ERROR "Unsupported system: ${CMAKE_SYSTEM_NAME}")
+#endif()
 
 
 

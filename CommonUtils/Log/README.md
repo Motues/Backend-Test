@@ -70,13 +70,13 @@ logger.Error("Critical operation failed");
 
 测试环境：
 ```
-OS: OS: Ubuntu 24.04.2 LTS x86_64
+OS: Ubuntu 24.04.2 LTS x86_64
 CPU: 13th Gen Intel i5-1340P (16) @ 4.600GHz
 Memory: 32GB DDR4
 ```
 | 场景 | 吞吐量          |
 |------|--------------|
-| 纯控制台输出 | 20,000条/秒    |
+| 纯控制台输出 | 200,000条/秒   |
 | 纯文件输出 | 1,200,000条/秒 |
 
 ## 注意事项
