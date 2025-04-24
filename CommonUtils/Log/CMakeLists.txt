@@ -10,5 +10,4 @@ AddCXXModule(
     SOURCE_DIR "src"
     TESTER_DIR "test"
     LINKS
-        Utils::ThreadPool
 )

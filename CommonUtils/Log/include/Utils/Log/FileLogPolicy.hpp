@@ -1,7 +1,6 @@
 #pragma once
 
 #include "LogPolicy.hpp"
-#include "Utils/ThreadPool.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -12,6 +11,8 @@
 #include <atomic>
 #include <iomanip>
 #include <condition_variable>
+#include <array>
+#include <queue>
 
 namespace Utils::Log {
 

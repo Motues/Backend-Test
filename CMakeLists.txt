@@ -37,7 +37,6 @@ AddModulesInDirectory(
         "JSON"
         "Log"
         "MessageQueue"
-
 )
 
 
