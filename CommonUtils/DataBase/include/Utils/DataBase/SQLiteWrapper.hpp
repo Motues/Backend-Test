@@ -4,12 +4,11 @@
 #include "Model.hpp"
 
 #include <sqlite3.h>
-#include <vector>
-#include <map>
+
 
 namespace Utils :: DataBase {
 
-	using SQLiteQueryResult = std::vector<std::map<std::string, std::string>>;
+
 
 	class SQLiteWrapper {
 	public:
