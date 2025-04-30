@@ -16,3 +16,5 @@ ThirdParties/
 
 # Cache
 cache/
+Cache/
+.cache/
