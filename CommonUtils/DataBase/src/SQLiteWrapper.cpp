@@ -28,12 +28,12 @@ namespace Utils :: DataBase {
         }
     }
 
-    SQLiteWrapper::SQLiteQueryResult query(const std::string& sql) {
+    SQLiteQueryResult SQLiteWrapper::QueryData(const std::string& sql) {
         std::vector<std::map<std::string, std::string>> result;
         sqlite3_stmt* stmt = nullptr;
 
-        if (sqlite3_prepare_v2(db_, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
-            throw std::runtime_error("Failed to prepare statement: " + std::string(sqlite3_errmsg(db_)));
+        if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
+            throw std::runtime_error("Failed to prepare statement: " + std::string(sqlite3_errmsg(db)));
         }
 
         int columnCount = sqlite3_column_count(stmt);

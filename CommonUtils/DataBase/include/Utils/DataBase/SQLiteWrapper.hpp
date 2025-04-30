@@ -20,7 +20,7 @@ namespace Utils :: DataBase {
         void InsertData();
         void DeleteData();
         void UpdateData();
-        SQLiteQueryResult QueryData();
+        SQLiteQueryResult QueryData(const std::string &sql);
         void SQLitesyntax(std::string &sql);
 
 	private:

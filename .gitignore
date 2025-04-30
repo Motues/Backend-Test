@@ -13,3 +13,6 @@
 
 # thirdparty
 ThirdParties/
+
+# Cache
+cache/
